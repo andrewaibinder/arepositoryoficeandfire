@@ -31,15 +31,25 @@ function import_characters(){
 };
 
 function character_info(){
-	var name = document.getElementById("characterSelect").value;
-	var year = document.getElementById("yearValue").value;
+	var character_id = document.getElementById("characterSelect").value;
     var req = new XMLHttpRequest();
 	req.responseType = 'json';
-	url = "character_info?character_id=" + name + "&year_gap=" + year
+	url = "character_info?character_id=" + character_id
     req.open("GET", url, true);
     req.onload = function() {
 	   var info = req.response;
-	   console.log(info);
+	  	var modal = document.getElementById('myModal');
+		modal.style.display = "block";
+		var span = document.getElementsByClassName("close")[0];
+		span.onclick = function() {
+		    modal.style.display = "none";
+		}
+		window.onclick = function(event) {
+		    if (event.target == modal) {
+		        modal.style.display = "none";
+		    }
+		}
+		document.getElementById("modal_text").innerHTML = info;
      };
 	req.send(null);
 

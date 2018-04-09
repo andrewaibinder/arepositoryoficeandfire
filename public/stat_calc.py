@@ -60,55 +60,55 @@ def value_extractor(born_string, extract_style):
 
 def collect_templates():
 
-    templates = dict()
-    templates[r'\AIn \d{1,3} AC\Z'] = "only"
-    templates[r'\AIn \d{1,3} AC, at '] = "only"
-    templates[r'\AAt \d{1,3} AC\Z'] = "only"
-    templates[r'\A\d{1,3} AC\Z'] = "only"
-    templates[r'\A\d{1,3} AC, at '] = "only"
+    template_dict = dict()
+    template_dict[r'\AIn \d{1,3} AC\Z'] = "only"
+    template_dict[r'\AIn \d{1,3} AC, at '] = "only"
+    template_dict[r'\AAt \d{1,3} AC\Z'] = "only"
+    template_dict[r'\A\d{1,3} AC\Z'] = "only"
+    template_dict[r'\A\d{1,3} AC, at '] = "only"
 
-    templates[r'\AIn \d{1,3} AC \(roughly\)\Z'] = "only_roughly"
-    templates[r'\AIn \d{1,3} AC \(roughly\), at'] = "only_roughly"
-    templates[r'\AIn or around \d{1,3} AC\Z'] = "only_roughly"
-    templates[r'\AIn about \d{1,3} AC, at'] = "only_roughly"
-    templates[r'\AIn or around \d{1,3} AC \(roughly\)'] = "only_roughly"
+    template_dict[r'\AIn \d{1,3} AC \(roughly\)\Z'] = "only_roughly"
+    template_dict[r'\AIn \d{1,3} AC \(roughly\), at'] = "only_roughly"
+    template_dict[r'\AIn or around \d{1,3} AC\Z'] = "only_roughly"
+    template_dict[r'\AIn about \d{1,3} AC, at'] = "only_roughly"
+    template_dict[r'\AIn or around \d{1,3} AC \(roughly\)'] = "only_roughly"
 
-    templates[r'\AIn or between \d{1,3} AC and \d{1,3} AC\Z'] = 'first_second'
-    templates[r'\AIn or between \d{1,3} AC and \d{1,3} AC, at'] = 'first_second'
-    templates[r'\AIn \d{1,3} AC or \d{1,3} AC\Z'] = 'first_second'
-    templates[r'\AIn \d{1,3} AC or \d{1,3} AC, at'] = 'first_second'
-    templates[r'\AIn or between \d{1,3} AC or \d{1,3} AC\Z'] = 'first_second'
-    templates[r'\AIn \d{1,3} or \d{1,3} AC\Z'] = 'first_second'
-    templates[r'\AIn either \d{1,3} AC, \d{1,3} AC or \d{1,3} AC\Z'] = 'first_second'
-    templates[r'\AIn either \d{1,3} AC, \d{1,3} AC or \d{1,3} AC, at'] = 'first_second'
-    templates[r'\AIn \d{1,3} AC, \d{1,3} AC or \d{1,3} AC\Z'] = 'first_second'
-    templates[r'\AIn \d{1,3} AC, \d{1,3} AC or \d{1,3} AC, at'] = 'first_second'
-    templates[r'\AIn or around \d{1,3} AC, \d{1,3} AC or \d{1,3} AC'] = 'first_second'
-    templates[r'\AAt \d{1,3} AC or \d{1,3} AC\Z'] = 'first_second'
-    templates[r'\AIn \d{1,3} AC and \d{1,3} AC\Z'] = 'first_second'
-    templates[r'\Aor between \d{1,3} AC and \d{1,3} AC, at'] = 'first_second'
-    templates[r'\AAt \d{1,3} AC, \d{1,3} AC or \d{1,3} AC\Z'] = 'first_second'
+    template_dict[r'\AIn or between \d{1,3} AC and \d{1,3} AC\Z'] = 'first_second'
+    template_dict[r'\AIn or between \d{1,3} AC and \d{1,3} AC, at'] = 'first_second'
+    template_dict[r'\AIn \d{1,3} AC or \d{1,3} AC\Z'] = 'first_second'
+    template_dict[r'\AIn \d{1,3} AC or \d{1,3} AC, at'] = 'first_second'
+    template_dict[r'\AIn or between \d{1,3} AC or \d{1,3} AC\Z'] = 'first_second'
+    template_dict[r'\AIn \d{1,3} or \d{1,3} AC\Z'] = 'first_second'
+    template_dict[r'\AIn either \d{1,3} AC, \d{1,3} AC or \d{1,3} AC\Z'] = 'first_second'
+    template_dict[r'\AIn either \d{1,3} AC, \d{1,3} AC or \d{1,3} AC, at'] = 'first_second'
+    template_dict[r'\AIn \d{1,3} AC, \d{1,3} AC or \d{1,3} AC\Z'] = 'first_second'
+    template_dict[r'\AIn \d{1,3} AC, \d{1,3} AC or \d{1,3} AC, at'] = 'first_second'
+    template_dict[r'\AIn or around \d{1,3} AC, \d{1,3} AC or \d{1,3} AC'] = 'first_second'
+    template_dict[r'\AAt \d{1,3} AC or \d{1,3} AC\Z'] = 'first_second'
+    template_dict[r'\AIn \d{1,3} AC and \d{1,3} AC\Z'] = 'first_second'
+    template_dict[r'\Aor between \d{1,3} AC and \d{1,3} AC, at'] = 'first_second'
+    template_dict[r'\AAt \d{1,3} AC, \d{1,3} AC or \d{1,3} AC\Z'] = 'first_second'
 
-    templates[r'\AIn or between ~\d{1,3} AC and \d{1,3} AC\Z'] = "first_second_roughly"
-    templates[r'\AIn or between ~\d{1,3} AC and \d{1,3} AC\Z'] = "first_second_roughly"
-    templates[r'\AIn or between \d{1,3} AC and \d{1,3} AC \(roughly\)\Z'] = "first_second_roughly"
-    templates[r'\AIn or between \d{1,3} AC and \d{1,3} AC \(roughly\), at'] = "first_second_roughly"
+    template_dict[r'\AIn or between ~\d{1,3} AC and \d{1,3} AC\Z'] = "first_second_roughly"
+    template_dict[r'\AIn or between ~\d{1,3} AC and \d{1,3} AC\Z'] = "first_second_roughly"
+    template_dict[r'\AIn or between \d{1,3} AC and \d{1,3} AC \(roughly\)\Z'] = "first_second_roughly"
+    template_dict[r'\AIn or between \d{1,3} AC and \d{1,3} AC \(roughly\), at'] = "first_second_roughly"
 
-    templates[r'\AIn \d{1,3}AC or after\Z'] = "in_or_after"
-    templates[r'\AIn \d{1,3} AC or later\Z'] = "in_or_after"
-    templates[r'\AIn After \d{1,3} AC\Z'] = "in_or_after"
-    templates[r'\AIn \d{1,3} AC or later, at'] = "in_or_after"
+    template_dict[r'\AIn \d{1,3}AC or after\Z'] = "in_or_after"
+    template_dict[r'\AIn \d{1,3} AC or later\Z'] = "in_or_after"
+    template_dict[r'\AIn After \d{1,3} AC\Z'] = "in_or_after"
+    template_dict[r'\AIn \d{1,3} AC or later, at'] = "in_or_after"
 
-    templates[r'\AIn or before \d{1,3} AC\Z'] = "in_or_before"
-    templates[r'\Aor before \d{1,3} AC\Z'] = "in_or_before"
-    templates[r'\AIn \d{1,3} AC or before\Z'] = "in_or_before"
-    templates[r'\AIn \d{1,3} AC or before, at'] = "in_or_before"
+    template_dict[r'\AIn or before \d{1,3} AC\Z'] = "in_or_before"
+    template_dict[r'\Aor before \d{1,3} AC\Z'] = "in_or_before"
+    template_dict[r'\AIn \d{1,3} AC or before\Z'] = "in_or_before"
+    template_dict[r'\AIn \d{1,3} AC or before, at'] = "in_or_before"
 
-    templates[r'\AIn \d{1,3} AC or before \(roughly\)\Z'] = "in_or_before_roughly"
-    templates[r'\A\d{1,3} BC, at'] = "only_negative"
-    templates[r'\AIn \d{1,3}BC or \d{1,3}BC, at'] = "first_neg_second_neg"
+    template_dict[r'\AIn \d{1,3} AC or before \(roughly\)\Z'] = "in_or_before_roughly"
+    template_dict[r'\A\d{1,3} BC, at'] = "only_negative"
+    template_dict[r'\AIn \d{1,3}BC or \d{1,3}BC, at'] = "first_neg_second_neg"
 
-    return templates
+    return template_dict
 
 
 def born_parser(born_string):

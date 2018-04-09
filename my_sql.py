@@ -4,7 +4,7 @@ import ConfigParser as cf
 character_table = "CHARACTERS"
 house_table = "HOUSES"
 character_house_fact_table = "HOUSE_FACT"
-
+character_full_table = "intersected_characters"
 
 def get_connect():
 
@@ -83,19 +83,18 @@ def create_house_insert_query(house):
 
 def select_all_names_query():
 	select_query = """
-	SELECT id, name FROM {}
-	""".format(character_table)
+	SELECT character_id, name_x FROM {}
+	WHERE character_id is not null and name_x is not null
+	""".format(character_full_table)
 	return select_query
 
 
 def select_character_by_id(character_id):
 	select_query = """
-	SELECT c.name, c.gender, c.culture, c.born, c.died, c.father, c.mother, c.spouse, h.name
-	FROM {} c
-	LEFT JOIN {} f ON (c.id = f.character_id)
-	LEFT JOIN {} h ON (f.house_id = h.id)
-	WHERE c.id = {}
-	""".format(character_table, character_house_fact_table, house_table, character_id)
+	SELECT *
+	FROM {}
+	WHERE character_id = {}
+	""".format(character_full_table, character_id)
 	return select_query
 
 
@@ -206,8 +205,8 @@ def find_name_info(character_id):
 	print id_query
 	id_values = None
 	try:
-	    id_response = cursor.execute(id_query)
-	    id_values = cursor.fetchone()  # fetch the first row only
+	    cursor.execute(id_query)
+	    id_values = cursor.fetchone()
 	except Exception as e:
 		print "Error: unable to read data(find_all_names function)"
 		print (e)
