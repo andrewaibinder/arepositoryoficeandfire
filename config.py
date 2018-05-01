@@ -45,5 +45,3 @@ def get_db_configurations():
 	configs['user'] = config.get('User Credentials', 'user')
 	configs['password'] = config.get('User Credentials', 'passwd')
 	return configs
-
-from config import get_main_configurations
