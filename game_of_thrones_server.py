@@ -9,7 +9,12 @@ from sql import find_all_names, find_name_info
 from log import log
 
 
+def add_AC_BC(year):
+    print type(year)
+
+
 def born_express(start, end):
+    add_AC_BC(start)
     if start == None and end == None:
         return "Unknown"
     elif start == None:

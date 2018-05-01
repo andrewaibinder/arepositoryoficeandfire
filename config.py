@@ -24,7 +24,7 @@ def get_main_configurations():
 	configurations['log_name']=config.get('Logs', 'log_name')
 	configurations['log_directory']=config.get('Logs', 'log_directory')
 
-	configurations['rough_shift'] =config.get('Magic Numbers', 'rough_shift')
+	configurations['shift'] =int(config.get('Magic Numbers', 'rough_shift'))
 
 	configurations['IP'] =config.get('Server', 'IP')
 	configurations['Port'] =int(config.get('Server', 'Port'))
