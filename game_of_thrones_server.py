@@ -1,13 +1,45 @@
-# encoding=utf8
+# encoding=latin1
 import cherrypy
 import os
 import json
-from my_sql import find_all_names, find_name_info
+
+from config import get_main_configurations
+from cgi import escape
+from sql import find_all_names, find_name_info
+from log import log
+
+
+def born_express(start, end):
+    if start == None and end == None:
+        return "Unknown"
+    elif start == None:
+        return "At or before {}".format(end)
+    elif end == None:
+        return "At or after {}".format(start)
+    if start == end:
+        return start
+    return "{} - {}".format(start, end)
+
+
+def character_raw_to_html(data):
+    if type(data) == tuple:
+        html = """
+            Name: {}
+        <br>Gender: {}
+        <br>House: {}
+        <br>Born:  {}
+        """.format(escape(data[0]), escape(data[1]), escape(data[2]),
+                   born_express(data[3], data[4]))
+    else:
+        html = "No Data For This Character"
+    return html
 
 
 class GameOfThrones(object):
     @cherrypy.expose
     def index(self):
+        log("New User")
+        log(cherrypy.request.headers)
         return """
         <!DOCTYPE html>
         <html>
@@ -39,13 +71,15 @@ class GameOfThrones(object):
 
     @cherrypy.expose
     def character_info(self, character_id):
-        print character_id
+        log(character_id)
         character_values = find_name_info(character_id)
-        print character_values
-        return json.dumps(character_values, encoding='latin1')
+        log(character_values)
+        character_html = character_raw_to_html(character_values)
+        return json.dumps(character_html, encoding='latin1')
 
 
 if __name__ == '__main__':
+    configs = get_main_configurations()
     conf = {
         '/': {
             'tools.sessions.on': True,
@@ -53,11 +87,13 @@ if __name__ == '__main__':
         },
         '/static': {
             'tools.staticdir.on': True,
-            'tools.staticdir.dir': './public'
+            'tools.staticdir.dir': configs['Public']
         }
     }
-    cherrypy.config.update({'server.socket_host': '0.0.0.0',
-                            'server.socket_port': 80,
+    cherrypy.config.update({'server.socket_host': configs['IP'],
+                            'server.socket_port': configs['Port'],
                             'tools.proxy.on': True
                             })
     cherrypy.quickstart(GameOfThrones(), '/', conf)
+
+
