@@ -77,38 +77,4 @@ def get_logger(format='%(asctime)s %(levelname)s %(threadName)s %(message)s',
 
     return logger
 
-def parse_spark_out(log_output):
-    """ parse spark output and return 3 lines
-    diagnostics
-    final status
-    tracking URL
-    """
-    log_lines = log_output.split('\n')
-    log_lines = [line.strip() for line in log_lines]
-
-    diagnostics = ''
-    final_status = ''
-    tracking_url = ''
-
-    try:
-        diagnostics = [line for line in log_lines 
-                           if line.startswith('diagnostics')][-1]
-    except IndexError:
-        pass
-    try:
-        final_status = [line for line in log_lines
-                            if line.startswith('final status')][-1]
-    except IndexError:
-        pass
-    try:
-        tracking_url = [line for line in log_lines
-                            if line.startswith('tracking URL')][-1]
-    except IndexError:
-        pass
-   
-    if diagnostics == '' and final_status == '' and tracking_url == '':
-        return log_output
-
-    return ' '.join([diagnostics, final_status, tracking_url ])
-
 configs = get_main_configurations()

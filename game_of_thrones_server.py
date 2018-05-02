@@ -10,11 +10,16 @@ from log import log
 
 
 def add_AC_BC(year):
-    print type(year)
+    if type(year) == long:
+        if year > 0:
+            return "{} AC".format(year)
+        elif year < 0:
+            return "{} BC".format(year)
+    return year
 
 
 def born_express(start, end):
-    add_AC_BC(start)
+    start, end = add_AC_BC(start), add_AC_BC(end)
     if start == None and end == None:
         return "Unknown"
     elif start == None:
@@ -27,7 +32,7 @@ def born_express(start, end):
 
 
 def character_raw_to_html(data):
-    if type(data) == tuple:
+    if type(data) == list:
         html = """
             Name: {}
         <br>Gender: {}
@@ -100,5 +105,3 @@ if __name__ == '__main__':
                             'tools.proxy.on': True
                             })
     cherrypy.quickstart(GameOfThrones(), '/', conf)
-
-

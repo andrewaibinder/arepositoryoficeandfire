@@ -1,7 +1,9 @@
 import MySQLdb
+import pandas as pd
 
 from config import get_main_configurations, get_db_configurations
 from log import log
+from sqlalchemy import create_engine
 
 
 def get_connect():
@@ -14,73 +16,15 @@ def get_connect():
 	return conn
 
 
-def correct_format(column):
-	col_type = type(column)
-	if col_type == list or column == None:
-		return False
-	if column == "" or str(column).upper() == "NULL":
-		return False
-	return True
-
-
-def row_cleaner(row):
-	clean_row = []
-	for col in row:		
-		if type(col) == unicode:
-			col = col.replace('\'', '\\\'')
-			col = col.encode('latin-1')
-		if correct_format(col):
-			clean_col = "'{}'".format(col)
-		else:
-			clean_col = "NULL"
-		clean_row.append(clean_col)
-	return clean_row
-
-
-def data_cleaner(data):
-	clean_data = [row_cleaner(row) for row in data]
-	return clean_data
-
-
-def bulk_formatter(data):
-	clean_data = data_cleaner(data)
-	formatted_rows = ['({})'.format(",".join([str(c) for c in row]))
-	                for row in clean_data]
-	return """,
-	""".join(formatted_rows)
-
-
-def create_update_query(id, start_range, end_range):
-	update_query = """
-	UPDATE {}
-	SET born_start = {}, born_end = {}
-	WHERE id = {}""".format(character_table, start_range, end_range, id)
-	return update_query	
-
-
-def create_pull_all_query():
-	select_query = """
-	SELECT id, born from {}
-	""".format(configs['character'])
-	return select_query
-
-
-def get_columns(table):
-	column_key = "{}_cols".format(table)
-	column_list = configs[column_key]
-	return ", ".join(column_list)
-
-
-def create_insert_query(bulk_data, table):
-	columns = get_columns(table)
-	formatted_data = bulk_formatter(bulk_data)
-	insert_query = """
-	INSERT INTO {}
-	({})
-	VALUES
-	{}
-	""".format(configs[table], columns, formatted_data)
-	return insert_query
+def get_engine_connect():
+	credentials = get_db_configurations()
+	host = credentials['host']
+	db = credentials['database']
+	user = credentials['user']
+	passwd = credentials['password']
+	engine = create_engine("mysql://{}:{}@{}/{}".format(user, passwd, host, db))
+	conn = engine.connect()
+	return conn
 
 
 def select_all_names_query():
@@ -88,17 +32,8 @@ def select_all_names_query():
 	SELECT c.id, c.name
 	FROM {} c
 	inner join {} f on f.character_id = c.id
-	WHERE name is not null AND
-	name != ''
+	WHERE name is not null
 	""".format(configs['CHARACTERS'], configs['FACT'])
-	return select_query
-
-
-def create_clear_query(table):
-	table_location = configs[table]
-	select_query = """
-	TRUNCATE {}
-	""".format(table_location)
 	return select_query
 
 
@@ -112,42 +47,6 @@ def select_character_by_id(character_id):
 	""".format(configs['FACT'], configs['CHARACTERS'], configs['HOUSES'],
 		       character_id)
 	return select_query
-
-
-def pull_all_raw_born():
-	conn = get_connect()
-	cursor = conn.cursor()
-	characters = []
-	select_query = create_pull_all_query()
-	try:
-		cursor.execute(select_query)
-		results = cursor.fetchall()
-		for row in results:
-			character = dict()
-			character['id'] = int(row[0])
-			character['born'] = row[1]
-			characters.append(character)
-	except Exception as e:
-		log("Error: unable to read data(pull_all_raw_born function)")
-		log(e)
-		conn.rollback()
-	conn.close()
-	return characters
-
-
-def update_birth_range(id, start_range, end_range):
-	conn = get_connect()
-	cursor = conn.cursor()
-	update_query = create_update_query(id, start_range, end_range)
-	try:
-		cursor.execute(update_query)
-		conn.commit()
-	except Exception as e:
-		log("Error: unable to write data(update_birth_range function)")
-		log(e)
-		conn.rollback()
-	conn.close()
-
 
 
 def find_all_names():
@@ -189,39 +88,63 @@ def find_name_info(character_id):
 	return id_values
 
 
-def clear_table(table):
-	conn = get_connect()
-	cursor = conn.cursor()
-	clear_query = create_clear_query(table)
-	try:
-		cursor.execute(clear_query)
-		conn.commit()
-	except Exception as e:
-		log("Error: unable to write data(insert_new_house function)")
-		log(e)
-		conn.rollback()
-	conn.close()
+def get_columns(table):
+	column_key = "{}_cols".format(table)
+	column_list = configs[column_key]
+	return column_list
 
 
-def insert_table(data, table):
-	conn = get_connect()
-	cursor = conn.cursor()
-	insert_query = create_insert_query(data, table)
-	try:
-		cursor.execute(insert_query)
-		conn.commit()
-	except Exception as e:
-		log("Error: unable to write data(insert_new_house function)")
-		log(e)
-		conn.rollback()
-	conn.close()
+def build_table(data, table):
+	engine_conn = get_engine_connect()
+	labels = get_columns(table)
+	df = pd.DataFrame(data, columns=labels)
+	df.to_sql(table, engine_conn, flavor=None, schema=None,
+          if_exists='replace', index=True, index_label=None,
+          chunksize=None, dtype=None)
 
 
 def populate_tables(api_data):
 	table_keys = [configs['FACT'], configs['CHARACTERS'], configs['HOUSES']]
 	for table in table_keys:
-		clear_table(table)
-		insert_table(api_data[table], table)
+		build_table(api_data[table], table)
+
+
+def create_df_query(table):
+    aggregate_query = """
+    SELECT * from {}
+    """.format(table)
+    return aggregate_query
+
+
+def get_dataframe(table):
+    engine_conn = get_engine_connect()
+    df_query = create_df_query(table)
+    df = pd.read_sql(df_query, engine_conn)
+    return df
+
+
+def get_name_dataframe():
+    engine_conn = get_engine_connect()
+    df_query = select_all_names_query()
+    df = pd.read_sql(df_query, engine_conn)
+    return df
+
+
+def get_lookup_dataframe(character_id):
+    engine_conn = get_engine_connect()
+    df_query = select_character_by_id(character_id)
+    df = pd.read_sql(df_query, engine_conn)
+    return df
+
+
+def find_name_info(character_id):
+	lookup_df = get_lookup_dataframe(character_id)
+	return lookup_df.values.tolist()[0]
+
+
+def find_all_names():
+	name_list_df = get_name_dataframe()
+	return name_list_df.values.tolist()
 
 
 configs = get_main_configurations()

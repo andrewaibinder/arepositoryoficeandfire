@@ -2,7 +2,6 @@ import re
 
 from config import get_main_configurations
 from log import log
-from sql import pull_all_raw_born, update_birth_range
 
 
 def clean_numbers(raw_numbers):
@@ -107,8 +106,6 @@ def collect_templates():
     r"""(?:In )?\d{1,3}BC or \d{1,3}BC(\Z|, at )"""
     )
 
-    
-
     return templates
 
 
@@ -126,6 +123,8 @@ def born_parser(born_string):
 
 
 def num_there(s):
+    if s == None:
+        return False
     return any(i.isdigit() for i in s)
 
 
