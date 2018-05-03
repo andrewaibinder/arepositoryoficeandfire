@@ -38,7 +38,8 @@ def character_raw_to_html(data):
         <br>Gender: {}
         <br>House: {}
         <br>Born:  {}
-        """.format(escape(data[0]), escape(data[1]), escape(data[2]),
+        """.format(escape(data[0]), escape(data[1]),
+                   "/".join([escape(house) for house in data[2]]),
                    born_express(data[3], data[4]))
     else:
         html = "No Data For This Character"

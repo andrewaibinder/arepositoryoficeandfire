@@ -139,7 +139,13 @@ def get_lookup_dataframe(character_id):
 
 def find_name_info(character_id):
 	lookup_df = get_lookup_dataframe(character_id)
-	return lookup_df.values.tolist()[0]
+	character_data = lookup_df.values.tolist()
+	houses = []
+	for row in character_data:
+		houses.append(row[2])
+	character_list = character_data[0]
+	character_list[2] = houses
+	return character_list
 
 
 def find_all_names():
